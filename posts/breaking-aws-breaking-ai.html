@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What breaking AWS taught me about breaking AI — j2a.me</title>
+<meta name="description" content="Attacking an IAM policy and attacking an LLM agent are the same move: find where authority outruns intent.">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<article class="wrap">
+  <a class="back" href="/">&larr; home</a>
+  <h1>What breaking AWS taught me about breaking AI</h1>
+  <span class="date">2026-07-05</span>
+
+  <p>I spend half my time breaking into AWS environments and the other half poking at AI systems &mdash; the LLM apps and agents companies are shipping as fast as they can write the prompt. On paper those are different jobs. In my head they're the same one. The instinct that finds a privilege-escalation path through an IAM policy is the exact instinct that finds a prompt injection. Both come down to one question: <strong>where does this system's authority outrun its intent?</strong></p>
+
+  <p>Let me show you what I mean, because once you see it you can't unsee it.</p>
+
+  <h2>The confused deputy never went away</h2>
+
+  <p>Cloud pentesters have a favorite bug class: the confused deputy. You find some component &mdash; a Lambda, a CI role, an SSRF-able metadata endpoint &mdash; that holds more permission than the caller should have, and you trick <em>it</em> into acting on your behalf. You're not authorized. The deputy is. So you make the deputy do it.</p>
+
+  <p>Prompt injection is a confused deputy attack. That's the whole trick. An LLM agent with tools is a deputy: it holds real authority &mdash; it can read a database, send an email, call an internal API &mdash; and it takes instructions from text. When some of that text comes from an attacker (a web page it summarizes, an email it reads, a support ticket it triages), the attacker is now writing instructions for a deputy that outranks them. Same bug, new substrate. We even solved it before, in a narrow way, with SSRF and IMDSv2. We just forgot the lesson before the next deputy showed up.</p>
+
+  <h2>Wildcards, but in English</h2>
+
+  <p>The first thing I look for in an IAM policy is <code>"Action": "*"</code> or a resource ARN that's broader than the job in front of it. Over-broad grants are where cloud compromises live &mdash; not because someone meant to hand out admin, but because scoping is tedious and <code>*</code> is easy.</p>
+
+  <p>AI tool definitions are IAM policies written in English, and they're full of wildcards nobody labels as wildcards. "The agent can run shell commands." "The agent has read access to the wiki." "It can query the database to answer questions." Every one of those is an <code>Action: *</code> waiting for an attacker-supplied instruction to aim it. The blast radius of a prompt injection isn't set by the model &mdash; it's set by the scope of the tools you handed the deputy. Give an agent a wildcard and injection becomes privilege escalation.</p>
+
+  <h2>The lesson transfers cleanly</h2>
+
+  <p>Here's the part that actually matters, and it's why I'm not scared of AI agents so much as I'm scared of how we're wiring them up. The mitigations are the ones we already know:</p>
+
+  <p><strong>Least privilege at the boundary.</strong> Don't ask "can the model be tricked?" &mdash; assume it can, the same way you assume any input-taking component can be confused. Ask instead: when it <em>is</em> tricked, what can the deputy actually do? Scope the tools like you'd scope a role. Read-only where you can. Narrow resources. No standing write access to anything you'd cry about.</p>
+
+  <p><strong>Don't let the caller's input define authority.</strong> In cloud, you never let the request decide its own permissions. Same rule: instructions and data need to live in different trust tiers, and the tier that came from outside must never be the tier that grants power. Most shipped agents collapse those two into one context window and call it a feature.</p>
+
+  <p><strong>Put the dangerous step behind a gate a human owns.</strong> The stuff I can't undo &mdash; a wire transfer, a delete, an outbound email &mdash; sits behind an explicit confirm, not because the model is dumb but because deputies get confused and the cost of that confusion should be bounded. (I build my own assistant this way: it can read and draft all day, but anything that leaves the house or can't be taken back waits for me to say go.)</p>
+
+  <h2>Same job, wider blast radius</h2>
+
+  <p>None of this is a new discipline. It's threat modeling, applied to a component that happens to speak English and improvise. The people who'll be good at securing AI systems aren't the ones who know the most about transformers &mdash; they're the ones who already have the reflex to ask where authority outruns intent, and who've watched that gap get exploited a hundred times in a hundred other systems.</p>
+
+  <p>The models are new. The mistake isn't. We're handing deputies broad authority and trusting untrusted input to guide them, and we're calling it progress. It's the oldest bug we have, wearing a very convincing new coat.</p>
+
+  <p>I'll be writing more of these &mdash; cloud, AI, the seam between them. If that's your seam too, stick around.</p>
+</article>
+<footer class="wrap"><p>Jake &middot; <a href="https://github.com/ctfjake">github</a></p></footer>
+</body>
+</html>
