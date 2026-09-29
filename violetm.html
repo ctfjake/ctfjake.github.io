@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>violeTM — AI threat modeling you can self-host</title>
+<title>violeTM: AI threat modeling you can self-host</title>
 <meta name="description" content="violeTM turns a plain-English description of your system into a full STRIDE threat model. Run the whole app locally with one Docker command.">
 <link rel="stylesheet" href="/style.css">
 </head>
@@ -18,27 +18,27 @@
   <h1>violeTM</h1>
   <p class="date">AI threat modeling, self-hosted</p>
 
-  <p>violeTM is an AI security architect you can run yourself. Describe your system in plain
-  English and it builds a data-flow model, walks every trust boundary, and produces a full
-  <strong>STRIDE</strong> threat model &mdash; ranked findings, remediation, and mappings to OWASP
-  ASVS and CWE. No SaaS account, no data leaving your machine: the only thing you bring is your own
-  Anthropic API key.</p>
+  <p>violeTM is an AI security architect you run yourself. You describe your system in plain
+  English, it builds a data-flow model, walks every trust boundary, and hands back a full
+  <strong>STRIDE</strong> threat model: ranked findings, remediation, and mappings to OWASP
+  ASVS and CWE. No SaaS account, and nothing leaves your machine. The only thing you bring is your
+  own Anthropic API key.</p>
 
   <figure>
     <img src="/img/violetm/01-landing.png" alt="violeTM landing page: Chat with an AI Security Architect">
-    <figcaption>Describe your system in plain English &mdash; violeTM does the modeling.</figcaption>
+    <figcaption>Describe your system in plain English and violeTM does the modeling.</figcaption>
   </figure>
 
-  <h2>Run it &mdash; one command</h2>
+  <h2>Run it in one command</h2>
   <p>You need <a href="https://docs.docker.com/get-docker/">Docker</a> and an
-  <a href="https://console.anthropic.com/">Anthropic API key</a>. Nothing else &mdash; no Node, no
+  <a href="https://console.anthropic.com/">Anthropic API key</a>. That's it. No Node, no
   Bun, no Postgres to install. From a clone of the repo:</p>
   <pre><code>export ANTHROPIC_API_KEY=sk-ant-...
 docker compose up</code></pre>
-  <p>That brings up the app and its database together, applies migrations on boot, and serves
-  violeTM at <a href="http://localhost:3000">http://localhost:3000</a>. It runs in local mode:
-  no login, everything stays on your box. Stop it with <code>Ctrl-C</code>; bring it back with the
-  same <code>docker compose up</code>.</p>
+  <p>That starts the app and its database together, runs migrations on boot, and serves
+  violeTM at <a href="http://localhost:3000">http://localhost:3000</a>. It runs in local mode, so
+  no login and everything stays on your box. Stop it with <code>Ctrl-C</code> and bring it back
+  with the same <code>docker compose up</code>.</p>
 
   <figure>
     <img src="/img/violetm/02-dashboard.png" alt="violeTM dashboard listing your projects">
@@ -46,8 +46,8 @@ docker compose up</code></pre>
   </figure>
 
   <h2>Model a system</h2>
-  <p>Create a project, describe the system &mdash; the components, how data flows, where the trust
-  boundaries are &mdash; and violeTM extracts a structured model from your description.</p>
+  <p>Create a project and describe the system: the components, how data flows, and where the trust
+  boundaries are. violeTM pulls a structured model out of that description.</p>
 
   <figure>
     <img src="/img/violetm/03-input.png" alt="violeTM new-project form with a system description">
@@ -55,9 +55,9 @@ docker compose up</code></pre>
   </figure>
 
   <h2>Read the threat model</h2>
-  <p>The report opens with a risk score, an input summary, and a rendered data-flow diagram, then
-  lays out every finding: STRIDE category, the affected component, likelihood and impact, a
-  plain-English "what this means for you", and concrete remediation with ASVS and CWE tags. You can
+  <p>The report opens with a risk score, a summary of your input, and a rendered data-flow diagram.
+  Then it lays out every finding: the STRIDE category, the affected component, likelihood and impact,
+  a plain-English "what this means for you", and concrete remediation with ASVS and CWE tags. You can
   export it, copy a fix prompt, or push findings to GitHub.</p>
 
   <figure>
@@ -86,13 +86,13 @@ bun install
 mkdir -p ./.threatlens/db
 bun run db:migrate:local
 bun run dev</code></pre>
-  <p>Set <code>ANTHROPIC_API_KEY</code> in your environment to enable the AI features. Want to see a
-  finished report without generating one? Seed the bundled sample (with the dev server stopped):</p>
+  <p>Set <code>ANTHROPIC_API_KEY</code> in your environment to turn on the AI features. Want to see a
+  finished report without generating one? Seed the bundled sample with the dev server stopped:</p>
   <pre><code>bun run scripts/seed-sample.ts</code></pre>
 
   <h2>Where the data goes</h2>
-  <p>Nowhere you don't control. In local mode violeTM stores everything in its own database on your
-  machine and talks only to the Anthropic API, using the key you supply, to do the modeling. There's
+  <p>Nowhere you don't control. In local mode violeTM keeps everything in its own database on your
+  machine and only talks to the Anthropic API, using the key you supply, to do the modeling. There's
   no violeTM account and no telemetry.</p>
 </article>
 
