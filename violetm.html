@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>violeTM: AI threat modeling you can self-host</title>
-<meta name="description" content="violeTM turns a plain-English description of your system into a full STRIDE threat model. Run the whole app locally with one Docker command.">
+<title>violeTM: AI threat modeling, hosted or self-hosted</title>
+<meta name="description" content="violeTM turns a plain-English description of your system into a grounded STRIDE threat model, with an AI-specific pass, compliance mappings, triage, and exports. Try the hosted demo or run the whole app yourself.">
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -16,68 +16,124 @@
 <article class="wrap">
   <a class="back" href="/">&larr; back</a>
   <h1>violeTM</h1>
-  <p class="date">AI threat modeling, self-hosted</p>
+  <p class="date">AI threat modeling, hosted or self-hosted</p>
 
-  <p>violeTM is an AI security architect you run yourself. You describe your system in plain
-  English, it builds a data-flow model, walks every trust boundary, and hands back a full
-  <strong>STRIDE</strong> threat model: ranked findings, remediation, and mappings to OWASP
-  ASVS and CWE. No SaaS account, and nothing leaves your machine. The only thing you bring is your
-  own Anthropic API key.</p>
+  <p>violeTM is an AI security architect. You describe your system in plain English, it builds a
+  data-flow model (components, data flows, trust boundaries, assets), walks every element, and hands
+  back a grounded <strong>STRIDE</strong> threat model: ranked findings, remediation, and mappings to
+  real control catalogs. It also runs an AI-specific pass for LLM apps, a privacy pass, compliance
+  mappings, and a full triage workflow, then lets you export the whole thing. Run it hosted or run it
+  yourself. The only secret you ever have to supply is your own Anthropic API key.</p>
 
   <figure>
     <img src="/img/violetm/01-landing.png" alt="violeTM landing page: Chat with an AI Security Architect">
     <figcaption>Describe your system in plain English and violeTM does the modeling.</figcaption>
   </figure>
 
-  <h2>Run it in one command</h2>
-  <p>You need <a href="https://docs.docker.com/get-docker/">Docker</a> and an
-  <a href="https://console.anthropic.com/">Anthropic API key</a>. That's it. No Node, no
-  Bun, no Postgres to install. From a clone of the repo:</p>
-  <pre><code>export ANTHROPIC_API_KEY=sk-ant-...
-docker compose up</code></pre>
-  <p>That starts the app and its database together, runs migrations on boot, and serves
-  violeTM at <a href="http://localhost:3000">http://localhost:3000</a>. It runs in local mode, so
-  no login and everything stays on your box. Stop it with <code>Ctrl-C</code> and bring it back
-  with the same <code>docker compose up</code>.</p>
-
-  <figure>
-    <img src="/img/violetm/02-dashboard.png" alt="violeTM dashboard listing your projects">
-    <figcaption>Your projects. Each one keeps its model and its generated report.</figcaption>
-  </figure>
+  <h2>Try it without installing anything</h2>
+  <p>There's a hosted build on Vercel with a guest mode, so you can model a system without creating an
+  account, and a <code>/demo</code> that opens a seeded, realistic sample report if you'd rather just
+  look around first. One thing to know: the hosted demo is a shared, disposable public sandbox.
+  Projects there are visible to anyone and it may get wiped at any time, so treat it as a place to
+  kick the tires, not to keep anything. For real work, self-host it (below) and your data stays with
+  you.</p>
 
   <h2>Model a system</h2>
-  <p>Create a project and describe the system: the components, how data flows, and where the trust
-  boundaries are. violeTM pulls a structured model out of that description.</p>
+  <p>Modeling is a conversation. You describe the system in plain English and keep talking: each
+  message updates the structured model (its components, data flows, trust boundaries, and assets)
+  rather than starting over. When you're ready, violeTM generates threats one structured pass per
+  element, so coverage is explicit. A banner at the top of the report surfaces any element that
+  failed instead of quietly dropping it.</p>
 
   <figure>
     <img src="/img/violetm/03-input.png" alt="violeTM new-project form with a system description">
-    <figcaption>A name and a description are enough to start.</figcaption>
+    <figcaption>A name and a description are enough to start, then refine it by chatting.</figcaption>
+  </figure>
+
+  <figure>
+    <img src="/img/violetm/02-dashboard.png" alt="violeTM dashboard listing your projects">
+    <figcaption>Your projects. Each one keeps its model, its report, and its version history.</figcaption>
   </figure>
 
   <h2>Read the threat model</h2>
-  <p>The report opens with a risk score, a summary of your input, and a rendered data-flow diagram.
-  Then it lays out every finding: the STRIDE category, the affected component, likelihood and impact,
-  a plain-English "what this means for you", and concrete remediation with ASVS and CWE tags. You can
-  export it, copy a fix prompt, or push findings to GitHub.</p>
+  <p>The project opens as two panes: a chat and sidebar rail on one side, the report on the other.
+  The report leads with a banded risk-score meter, a summary of your input, and a data-flow diagram.
+  Then it lays out every finding: the STRIDE category, the affected element, likelihood and impact
+  (severity is likelihood times impact), a plain-English "what this means for you", and concrete
+  remediation. Findings aren't free-form. They're constrained to a real control catalog, so each one
+  carries OWASP ASVS (V1 to V13) and CWE ids, and the remediation is tagged the same way. Severity
+  badges are color-coded and readable, and tooltips work by keyboard and tap, not just hover.</p>
+
+  <p>The diagram in the sidebar is a fit-to-width, legible thumbnail with a persistent "Click to
+  expand". Expanding opens a real pan and zoom lightbox (wheel to zoom, drag to pan, pinch on touch,
+  reset, close) shared by the sidebar and the report. The boxes are drawn with clean straight lines
+  and the labels are set in a hand-drawn font (Excalifont), which keeps the diagram readable without
+  looking like a stock stencil. Across the rest of the UI the type is Geist Sans and Mono.</p>
 
   <figure>
     <img src="/img/violetm/05-report-overview.png" alt="violeTM threat model overview: risk score, input summary, system diagram">
-    <figcaption>Overview: risk score, input summary, and the data-flow diagram.</figcaption>
+    <figcaption>Overview: a banded risk-score meter, input summary, and the data-flow diagram.</figcaption>
   </figure>
 
   <figure>
     <img src="/img/violetm/06-report-findings.png" alt="violeTM STRIDE findings with severity, remediation, and ASVS/CWE tags">
-    <figcaption>Findings: severity, threat narrative, remediation, and compliance mappings.</figcaption>
+    <figcaption>Findings: severity, threat narrative, plain-English impact, remediation, and ASVS plus CWE tags.</figcaption>
   </figure>
+
+  <h2>An AI-specific pass for AI apps</h2>
+  <p>If your system has an LLM in it, STRIDE alone misses the interesting parts. violeTM runs a
+  dedicated pass over the OWASP LLM Top 10 (2025), LLM01 through LLM10: prompt injection, sensitive
+  information disclosure, supply chain, data and model poisoning, improper output handling, excessive
+  agency, system-prompt leakage, vector and embedding weaknesses, misinformation, and unbounded
+  consumption. Same grounded findings, same remediation, aimed at the failure modes that are specific
+  to AI systems.</p>
+
+  <h2>Compliance and privacy</h2>
+  <p>Alongside STRIDE, violeTM runs a LINDDUN privacy pass with its own actionable remediation. It
+  also produces compliance mappings against OWASP ASVS, GDPR, SOC 2, and the Philippines Data Privacy
+  Act of 2012, flagging requirements as "at_risk". These mappings are deterministic (no extra LLM
+  call), so they're repeatable. Read them as a map of what to check, not a certificate (see the note
+  at the end).</p>
 
   <figure>
     <img src="/img/violetm/07-compliance.png" alt="violeTM compliance mapping: OWASP ASVS coverage and LINDDUN privacy cards">
-    <figcaption>Compliance view: OWASP ASVS coverage and LINDDUN privacy findings with GDPR references.</figcaption>
+    <figcaption>Compliance view: ASVS, GDPR, SOC 2 and Philippines DPA mappings, plus LINDDUN privacy findings.</figcaption>
   </figure>
 
-  <h2>Run it without Docker</h2>
-  <p>If you'd rather run from source, violeTM uses <a href="https://bun.sh/">Bun</a> and an embedded
-  Postgres (<a href="https://pglite.dev/">pglite</a>), so there's still nothing external to install:</p>
+  <h2>Triage, re-model, and track</h2>
+  <p>A threat model is a living document, so findings have a lifecycle. Each one can be open,
+  mitigated, accepted, transferred, or marked a false positive (that last state is there for exactly
+  when the AI gets it wrong, so you can dismiss it on the record). You can assign an owner, a due
+  date, and a justification. When the system changes, describe the change and re-model: violeTM shows
+  a diff against the previous version and keeps a version timeline with a risk trend that tells you
+  whether things got better, worse, or held flat.</p>
+
+  <h2>Get the findings out</h2>
+  <p>You can export the whole model as a Markdown report, or pull pieces: a prompt bundle, the diagram
+  as SVG or PNG, an executive summary, and a GitHub issue export that links back to the finding. Each
+  finding has a copy-prompt and a copy-fix button for pasting straight into your editor or agent.
+  There's also a downloadable repo-rules <code>.zip</code> (CLAUDE.md, AGENTS.md, .cursorrules) built
+  from your open findings, so your coding assistant starts out knowing what to avoid. And you can
+  publish a public, read-only share link, with a revoke control for when you're done sharing.</p>
+
+  <h2>Self-host it</h2>
+  <p>violeTM is built on Next.js 16, React 19, Bun, and Tailwind 4, with Drizzle ORM over Postgres
+  (Neon, plain node-postgres, or an embedded <a href="https://pglite.dev/">pglite</a>). Auth is Clerk
+  by default but swappable, including a single-user local no-auth mode. The AI is Claude native (Haiku
+  4.5 for extraction, Sonnet 5 for generation) with multi-provider support through the Vercel AI SDK,
+  so you can point it at OpenAI, Google, or a compatible endpoint instead. Diagrams render with
+  Excalidraw and mermaid.</p>
+
+  <p>The simplest way to run your own copy: you need <a href="https://docs.docker.com/get-docker/">Docker</a>
+  and an <a href="https://console.anthropic.com/">Anthropic API key</a>, nothing else to install.</p>
+  <pre><code>export ANTHROPIC_API_KEY=sk-ant-...
+docker compose up</code></pre>
+  <p>That starts the app and its database together, runs migrations on boot, and serves violeTM at
+  <a href="http://localhost:3000">http://localhost:3000</a> in local, no-login mode. Stop it with
+  <code>Ctrl-C</code> and bring it back with the same <code>docker compose up</code>.</p>
+
+  <p>If you'd rather run from source with zero external services, use <a href="https://bun.sh/">Bun</a>
+  with the embedded pglite database:</p>
   <pre><code>export AUTH_PROVIDER=local
 export DB_DRIVER=pglite
 export PGLITE_PATH=./.threatlens/db
@@ -86,14 +142,25 @@ bun install
 mkdir -p ./.threatlens/db
 bun run db:migrate:local
 bun run dev</code></pre>
-  <p>Set <code>ANTHROPIC_API_KEY</code> in your environment to turn on the AI features. Want to see a
-  finished report without generating one? Seed the bundled sample with the dev server stopped:</p>
+  <p>Set <code>ANTHROPIC_API_KEY</code> in your environment to turn on the AI features. Want a finished
+  report without generating one? Seed the bundled sample with the dev server stopped:</p>
   <pre><code>bun run scripts/seed-sample.ts</code></pre>
 
   <h2>Where the data goes</h2>
-  <p>Nowhere you don't control. In local mode violeTM keeps everything in its own database on your
-  machine and only talks to the Anthropic API, using the key you supply, to do the modeling. There's
-  no violeTM account and no telemetry.</p>
+  <p>When you self-host in local mode, violeTM keeps everything in its own database on your machine and
+  only talks to the AI provider you configured, using the key you supply, to do the modeling. No
+  violeTM account, no telemetry. (The hosted demo is the exception, as noted above: it's a shared
+  public sandbox, so don't put anything real there.)</p>
+
+  <h2>A note on what this is and isn't</h2>
+  <p>violeTM is a tool to help you think, not an authority. It isn't legal advice. The AI output is a
+  lead to verify, not a certification, and it can be wrong, which is exactly why the false-positive
+  state exists. The compliance packs are mappings that flag requirements as "at_risk"; they are not a
+  certification against ASVS, GDPR, SOC 2, or the Philippines DPA. Use the findings to drive real
+  review by a real person.</p>
+
+  <p>violeTM is going open source soon. If that's interesting to you, keep an eye on
+  <a href="https://github.com/ctfjake">the GitHub</a>.</p>
 </article>
 
 <footer class="wrap">
